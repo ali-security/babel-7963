@@ -10,7 +10,7 @@ permissions:
 jobs:
   welcome:
     name: Welcome comment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check if Babel member
         id: is_babel_member
@@ -42,7 +42,7 @@ jobs:
 
   needs_info:
     name: Needs Info
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Create Needs Info Comment
         uses: babel/actions/create-comment@v2
@@ -84,7 +84,7 @@ jobs:
 
   npm_cache:
     name: Npm Cache
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Npm Cache Comment
         uses: babel/actions/create-comment@v2
@@ -102,7 +102,7 @@ jobs:
             for example, https://www.npmjs.com/package/@babel/types?activeTab=versions is the URL for `@babel/types`
             (replace `@babel/types` in the URL with the package you want to check). If you see zero downloads don't worry:
             npm can take up to a few days to display the downloads count, but this does not mean that the package is not available.
-            
+
             Here are some things you can try:
 
             1. Please check if there is a stale proxy or cache between you and npm

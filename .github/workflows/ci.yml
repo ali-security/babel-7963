@@ -12,7 +12,7 @@ concurrency:
 jobs:
   prepare-yarn-cache:
     name: Prepare Cache
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,8 +21,8 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
-      - name: 'Check or update Yarn cache (fix w/ "yarn install")'
+          cache: yarn
+      - name: Check or update Yarn cache (fix w/ "yarn install")
         env:
           YARN_ENABLE_HARDENED_MODE: true # enable hardened mode as CI may run on untrusted repos
           YARN_ENABLE_SCRIPTS: false # disable post-install scripts
@@ -33,7 +33,7 @@ jobs:
   yarn-validate:
     name: Validate Yarn dependencies and constraints
     needs: prepare-yarn-cache
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,11 +42,11 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
-      - name: 'Check for unmet constraints (fix w/ "yarn constraints --fix")'
+          cache: yarn
+      - name: Check for unmet constraints (fix w/ "yarn constraints --fix")
         run: |
           yarn constraints
-      - name: 'Check for duplicate dependencies (fix w/ "yarn dedupe")'
+      - name: Check for duplicate dependencies (fix w/ "yarn dedupe")
         run: |
           yarn dedupe --check
       - name: Check for dependency cycles
@@ -62,7 +62,7 @@ jobs:
   test-esm:
     name: Test ESM version
     needs: prepare-yarn-cache
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -75,7 +75,7 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Use ESM and build
         run: make use-esm
         env:
@@ -89,7 +89,7 @@ jobs:
   build:
     name: Build Babel Artifacts
     needs: prepare-yarn-cache
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Yarn PnP does not support native ESM yet (https://github.com/yarnpkg/berry/issues/638)
     # env:
     #    YARN_NODE_LINKER: pnp # use pnp linker for better linking performance and stricter checks
@@ -101,7 +101,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Build babel artifacts
         run: |
           make -j build-standalone-ci
@@ -141,7 +141,7 @@ jobs:
 
   build-windows:
     name: Build Babel Artifacts on Windows
-    runs-on: windows-latest
+    runs-on: windows-2025
     # Yarn PnP does not support native ESM yet (https://github.com/yarnpkg/berry/issues/638)
     # env:
     #    YARN_NODE_LINKER: pnp # use pnp linker for better linking performance and stricter checks
@@ -153,7 +153,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Build babel artifacts
         shell: bash
         run: |
@@ -169,7 +169,7 @@ jobs:
   lint:
     name: Lint
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -178,7 +178,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: yarn install
       - uses: actions/download-artifact@v4
@@ -193,7 +193,7 @@ jobs:
   test-coverage:
     name: Test on Node.js Latest (with coverage)
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -202,7 +202,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: |
           yarn install
@@ -225,7 +225,7 @@ jobs:
   test:
     name: Test on Node.js ${{matrix.node-version}}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -238,7 +238,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: |
           yarn install
@@ -287,7 +287,7 @@ jobs:
           node ./node_modules/.bin/jest --ci
         env:
           BABEL_ENV: test
-          TEST_FUZZ: "${{ (matrix.node-version == '6' || matrix.node-version == '8' || matrix.node-version == '10') && 'false' || 'true' }}"
+          TEST_FUZZ: ${{ (matrix.node-version == '6' || matrix.node-version == '8' || matrix.node-version == '10') && 'false' || 'true' }}
       - name: Use Node.js latest # For `yarn version` in post actions of the first actions/setup-node
         if: matrix.node-version == '6' || matrix.node-version == '8' || matrix.node-version == '10'
         uses: actions/setup-node@v4
@@ -300,7 +300,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-2025, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -310,7 +310,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: yarn install
       - uses: actions/download-artifact@v4
@@ -324,7 +324,7 @@ jobs:
   external-parser-tests:
     name: Third-party Parser Tests
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -333,7 +333,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: yarn install
       - uses: actions/download-artifact@v4
@@ -351,7 +351,7 @@ jobs:
   runtime-interop-prepare:
     name: Prepare runtime integration tests
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -360,7 +360,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       # See https://github.com/babel/babel/pull/12906
       - name: Support self-references on old Node.js
         run: |
@@ -396,29 +396,11 @@ jobs:
   runtime-interop:
     name: Test @babel/runtime integrations on Node.js
     needs: [build, runtime-interop-prepare]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        node-version:
-          [
-            10,
-            "12.0",
-            12.12,
-            12.13,
-            12.15,
-            12.16,
-            "13.0",
-            13.2,
-            13.6,
-            13.7,
-            14.2,
-            16.5,
-            16.6,
-            22.11,
-            22.12,
-            "23.10",
-          ]
+        node-version: [10, '12.0', 12.12, 12.13, 12.15, 12.16, '13.0', 13.2, 13.6, 13.7, 14.2, 16.5, 16.6, 22.11, 22.12, '23.10']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -427,7 +409,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       # See https://github.com/babel/babel/pull/12906
       - name: Support self-references on old Node.js
         run: |
@@ -465,7 +447,7 @@ jobs:
   eslint7-test:
     name: Test @babel/eslint-* with ESLint 7.5.0
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -474,7 +456,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: yarn install
       - uses: actions/download-artifact@v4
@@ -488,7 +470,7 @@ jobs:
   eslint8-test:
     name: Test @babel/eslint-* with ESLint 8.0.0
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -497,7 +479,7 @@ jobs:
         with:
           node-version: latest
           check-latest: true
-          cache: "yarn"
+          cache: yarn
       - name: Install
         run: yarn install
       - uses: actions/download-artifact@v4
@@ -510,7 +492,7 @@ jobs:
 
   test262-prepare:
     name: test262 - Prepare for running in parallel
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.repository == 'babel/babel'
     steps:
       - name: Checkout Babel
@@ -547,7 +529,7 @@ jobs:
     strategy:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build, test262-prepare]
     steps:
       - name: Checkout Babel
@@ -587,7 +569,7 @@ jobs:
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell
         shell: bash
         env:
-          BABEL_PATH: ".."
+          BABEL_PATH: ..
           TEST262_PATH: ../build/test262
           THREADS: 4
           CHUNKS_FILE: ../test262-chunks.json
@@ -601,25 +583,25 @@ jobs:
 
   test262-finish:
     name: test262 - Analyze results
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: test262
     steps:
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-0 }
+        with: {name: test262-result-0}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-1 }
+        with: {name: test262-result-1}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-2 }
+        with: {name: test262-result-2}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-3 }
+        with: {name: test262-result-3}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-4 }
+        with: {name: test262-result-4}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-5 }
+        with: {name: test262-result-5}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-6 }
+        with: {name: test262-result-6}
       - uses: actions/download-artifact@v4
-        with: { name: test262-result-7 }
+        with: {name: test262-result-7}
       - name: Merge chunk results
         run: |
           cat test262-0.tap test262-1.tap test262-2.tap test262-3.tap \
@@ -643,7 +625,7 @@ jobs:
           node lib/download-main-artifact/index.mjs ~/test262-main.tap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: '7.x'
+          BRANCH: 7.x
       - name: Compare previous 7.x branch & current results
         run: |
           cd babel-test262-runner

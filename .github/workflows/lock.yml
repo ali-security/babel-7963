@@ -1,9 +1,7 @@
 name: Lock Threads
 
 on:
-  schedule:
-    - cron: '0 4 * * *'
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:
@@ -11,12 +9,12 @@ jobs:
     permissions:
       issues: write  # for dessant/lock-threads to lock issues
       pull-requests: write  # for dessant/lock-threads to lock PRs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: dessant/lock-threads@v4
         with:
           github-token: ${{ github.token }}
-          issue-inactive-days: "91"
-          add-issue-labels: "outdated"
-          pr-inactive-days: "91"
-          add-pr-labels: "outdated"
+          issue-inactive-days: '91'
+          add-issue-labels: outdated
+          pr-inactive-days: '91'
+          add-pr-labels: outdated

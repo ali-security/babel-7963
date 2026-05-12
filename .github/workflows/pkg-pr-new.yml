@@ -13,15 +13,15 @@ concurrency:
 jobs:
   publish:
     name: Publish to pkg.pr.new
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Use Node.js latest
         uses: actions/setup-node@v4
         with:
-          node-version: "*"
-          cache: "yarn"
+          node-version: '*'
+          cache: yarn
       - name: Build
         run: make prepublish
       - name: Publish

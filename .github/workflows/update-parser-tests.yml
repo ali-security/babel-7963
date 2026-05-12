@@ -4,9 +4,6 @@ env:
 on:
   workflow_dispatch:
     inputs: {}
-  schedule:
-    - cron: "0 0 * * 5"
-
 permissions:
   contents: read
 
@@ -15,7 +12,7 @@ jobs:
     name: Update parser test262 tests
     permissions:
       contents: write # for Git to git push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -25,8 +22,8 @@ jobs:
       - name: Use Node.js latest
         uses: actions/setup-node@v4
         with:
-          node-version: "*"
-          cache: "yarn"
+          node-version: '*'
+          cache: yarn
       - name: Get latest test262 version
         id: test262
         run: echo "sha1=$(sh ./scripts/parser-tests/get-test262-version.sh)" >> $GITHUB_OUTPUT
